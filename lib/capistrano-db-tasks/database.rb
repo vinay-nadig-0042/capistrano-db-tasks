@@ -148,7 +148,7 @@ module Database
       end
     end
 
-    def remote_to_local(instance)
+    def remote_to_local(instance, download_only=false)
       local_db  = Database::Local.new(instance)
       remote_db = Database::Remote.new(instance)
 
@@ -159,18 +159,18 @@ module Database
       ensure
         remote_db.clean_dump_if_needed
       end
-      local_db.load(remote_db.output_file, instance.fetch(:db_local_clean))
+      local_db.load(remote_db.output_file, instance.fetch(:db_local_clean)) unless download_only
     end
 
-    def local_to_remote(instance)
+    def local_to_remote(instance, download_only=false)
       local_db  = Database::Local.new(instance)
       remote_db = Database::Remote.new(instance)
 
       check(local_db, remote_db)
 
       local_db.dump.upload
-      remote_db.load(local_db.output_file, instance.fetch(:db_local_clean))
-      File.unlink(local_db.output_file) if instance.fetch(:db_local_clean)
+      remote_db.load(local_db.output_file, instance.fetch(:db_local_clean)) unless download_only
+      File.unlink(local_db.output_file) if instance.fetch(:db_local_clean) unless download_only
     end
   end
 
