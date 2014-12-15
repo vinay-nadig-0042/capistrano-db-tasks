@@ -45,20 +45,16 @@ namespace :db do
     task :download do
       on roles(:db) do
         puts "Local database: #{Database::Local.new(self).database}"
-        if fetch(:skip_data_sync_confirm) || Util.prompt('Are you sure you want to erase your local database with server database')
-          Database.remote_to_local(self, true)
-        end
+        Database.remote_to_local(self, true)
       end
     end
   end
 
   namespace :remote do
     desc 'Synchronize your remote database using local database data'
-    task :download => 'capistrano_db_tasks:check_can_push' do
+    task :upload => 'capistrano_db_tasks:check_can_push' do
       on roles(:db) do
-        if fetch(:skip_data_sync_confirm) || Util.prompt('Are you sure you want to REPLACE THE REMOTE DATABASE with local database')
-          Database.local_to_remote(self, true)
-        end
+        Database.local_to_remote(self, true)
       end
     end
   end
